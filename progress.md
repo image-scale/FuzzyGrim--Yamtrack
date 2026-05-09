@@ -59,3 +59,10 @@
 **Commit**: Add calendar events feature for tracking upcoming media releases
 **Acceptance**: 10/10 criteria met
 **Verification**: tests FAIL on previous state (no events app), PASS on current state
+
+## Round 9
+**Task**: Task 9 - Implement statistics functionality
+**Files created**: src/app/statistics.py, src/app/tests/test_statistics.py
+**Commit**: Add statistics module for media distribution, scores, timeline, and activity tracking
+**Acceptance**: 10/10 criteria met
+**Verification**: tests FAIL on previous state (no statistics module), PASS on current state

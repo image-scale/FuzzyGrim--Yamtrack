@@ -120,3 +120,17 @@
 - [x] Tests verify Event creation and unique constraints
 - [x] Tests verify EventManager returns filtered events
 - [x] Tests verify sentinel time detection
+
+## Task 9: Implement statistics functionality
+
+### Acceptance Criteria
+- [x] Create app/statistics.py module
+- [x] get_user_media() returns all media for user in date range with counts
+- [x] get_media_type_distribution() formats data for pie chart
+- [x] get_status_distribution() returns status breakdown per media type
+- [x] get_score_distribution() returns score histogram and average
+- [x] get_timeline() organizes media by month-year
+- [x] calculate_streaks() computes current and longest activity streaks
+- [x] Tests verify media retrieval and counting
+- [x] Tests verify distribution calculations
+- [x] Tests verify streak calculation
