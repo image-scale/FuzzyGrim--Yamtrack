@@ -11,6 +11,8 @@ from django.core.validators import (
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 
+from app.helpers import minutes_to_hhmm
+
 
 class Sources(models.TextChoices):
     """Choices for the source of the item."""
@@ -213,15 +215,6 @@ class Media(models.Model):
         if self.progress > 0:
             self.progress -= 1
             self.save()
-
-
-def minutes_to_hhmm(total_minutes):
-    """Convert total minutes to human readable format."""
-    hours = int(total_minutes / 60)
-    minutes = int(total_minutes % 60)
-    if hours == 0:
-        return f'{minutes}min'
-    return f'{hours}h {minutes:02d}min'
 
 
 class Movie(Media):

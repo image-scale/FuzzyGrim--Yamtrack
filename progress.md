@@ -20,3 +20,18 @@
 **Commit**: Add specific media type models for tracking different kinds of content
 **Acceptance**: 13/13 criteria met
 **Verification**: tests FAIL on previous state (no Movie/Game etc. models), PASS on current state
+
+## Round 4
+**Task**: Task 4 - Implement TV/Season/Episode models
+**Files modified**: src/app/models.py, src/app/tests/test_models.py
+**Commit**: Add hierarchical TV/Season/Episode models for tracking television content
+**Acceptance**: 10/10 criteria met
+**Verification**: tests FAIL on previous state (no TV/Season/Episode models), PASS on current state
+
+## Round 5
+**Task**: Task 5 - Implement helper utilities
+**Files created**: src/app/helpers.py, src/app/tests/test_helpers.py
+**Files modified**: src/app/models.py (moved minutes_to_hhmm to helpers)
+**Commit**: Add helper utilities module with time formatting and search response functions
+**Acceptance**: 5/5 criteria met
+**Verification**: tests FAIL on previous state (no helpers module), PASS on current state

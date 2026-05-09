@@ -53,13 +53,22 @@
 ## Task 4: Implement TV/Season/Episode models
 
 ### Acceptance Criteria
-- [ ] TV model extends Media with relationship to seasons
-- [ ] Season model extends Media with relationship to TV show and episodes
-- [ ] Episode model stores episode tracking data with relationship to season
-- [ ] TV.progress property aggregates episode count from all non-zero seasons
-- [ ] Season.progress property returns highest watched episode number
-- [ ] TV/Season have unique constraints per user
-- [ ] Hierarchical relationships: TV -> Seasons -> Episodes
-- [ ] Tests verify TV progress aggregation across seasons
-- [ ] Tests verify Season progress returns correct episode number
-- [ ] Tests verify model relationships are correctly established
+- [x] TV model extends Media with relationship to seasons
+- [x] Season model extends Media with relationship to TV show and episodes
+- [x] Episode model stores episode tracking data with relationship to season
+- [x] TV.progress property aggregates episode count from all non-zero seasons
+- [x] Season.progress property returns highest watched episode number
+- [x] TV/Season have unique constraints per user
+- [x] Hierarchical relationships: TV -> Seasons -> Episodes
+- [x] Tests verify TV progress aggregation across seasons
+- [x] Tests verify Season progress returns correct episode number
+- [x] Tests verify model relationships are correctly established
+
+## Task 5: Implement helper utilities
+
+### Acceptance Criteria
+- [x] minutes_to_hhmm() function converts minutes to "Xh YYmin" format
+- [x] format_search_response() formats paginated search results
+- [x] Create app/helpers.py module for utility functions
+- [x] Tests verify minutes_to_hhmm formatting for various inputs
+- [x] Tests verify search response formatting
