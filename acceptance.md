@@ -106,3 +106,17 @@
 - [x] Tests verify CustomList creation and permissions
 - [x] Tests verify CustomListItem unique constraint
 - [x] Tests verify manager methods return correct results
+
+## Task 8: Implement calendar events
+
+### Acceptance Criteria
+- [x] Create events app with models.py
+- [x] Event model with item (ForeignKey), content_number, datetime, notification_sent
+- [x] Event has unique constraints for item+content_number combinations
+- [x] EventManager.get_user_events() returns events for user's tracked media in date range
+- [x] SentinelDatetime class for events without specific time
+- [x] Event.is_sentinel_time property checks if datetime is sentinel
+- [x] Event.readable_content_number property formats content number
+- [x] Tests verify Event creation and unique constraints
+- [x] Tests verify EventManager returns filtered events
+- [x] Tests verify sentinel time detection

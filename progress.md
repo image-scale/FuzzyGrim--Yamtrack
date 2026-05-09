@@ -51,3 +51,11 @@
 **Commit**: Add custom lists feature with owner/collaborator permissions and item management
 **Acceptance**: 14/14 criteria met
 **Verification**: tests FAIL on previous state (no lists app), PASS on current state
+
+## Round 8
+**Task**: Task 8 - Implement calendar events
+**Files created**: src/events/ (app with models.py, migrations/, tests/)
+**Files modified**: src/config/settings.py (added events to INSTALLED_APPS)
+**Commit**: Add calendar events feature for tracking upcoming media releases
+**Acceptance**: 10/10 criteria met
+**Verification**: tests FAIL on previous state (no events app), PASS on current state
