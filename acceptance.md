@@ -160,3 +160,16 @@
 - [x] Progress changes format appropriately per media type (playtime for games, pages for books)
 - [x] Tests verify get_verb and get_unit cover all media types
 - [x] Tests verify format_description for status, score, progress, notes changes
+
+## Task 16: Implement export functionality
+
+### Acceptance Criteria
+- [x] Create integrations app with exports.py module
+- [x] Echo class for streaming CSV output
+- [x] generate_rows() yields CSV rows for all user media
+- [x] get_model_fields() extracts field names from a model
+- [x] get_track_fields() collects all track fields from all media models
+- [x] Game progress formatted as time (Xh YYmin) in export
+- [x] Tests verify Echo class writes values correctly
+- [x] Tests verify field extraction functions
+- [x] Tests verify CSV generation with correct format

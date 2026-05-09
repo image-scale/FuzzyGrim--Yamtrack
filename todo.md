@@ -19,4 +19,4 @@ Build the Django application incrementally, starting with project configuration 
 - [x] Task 13: Implement IGDB provider for games and OpenLibrary/Hardcover providers for books (completed in Task 10)
 - [x] Task 14: Implement remaining providers - ComicVine for comics, BoardGameGeek for board games, MangaUpdates for manga (completed in Task 10)
 - [x] Task 15: Implement history processing for tracking changes with django-simple-history integration
-- [ ] Task 16: Implement export functionality for backing up user media data to CSV
+- [x] Task 16: Implement export functionality for backing up user media data to CSV

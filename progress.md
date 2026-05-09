@@ -80,3 +80,11 @@
 **Commit**: Add history processor for tracking and formatting media changes
 **Acceptance**: 11/11 criteria met
 **Verification**: tests FAIL on previous state (no history_processor module), PASS on current state
+
+## Round 12
+**Task**: Task 16 - Implement export functionality
+**Files created**: src/integrations/ (app with exports.py, tests/test_exports.py)
+**Files modified**: src/config/settings.py (added integrations to INSTALLED_APPS)
+**Commit**: Add export functionality for backing up user media data to CSV
+**Acceptance**: 9/9 criteria met
+**Verification**: tests FAIL on previous state (no integrations app), PASS on current state
