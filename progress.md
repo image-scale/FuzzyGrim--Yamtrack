@@ -13,3 +13,10 @@
 **Commit**: Add core media tracking models with Item metadata storage and Media tracking base class
 **Acceptance**: 13/13 criteria met
 **Verification**: tests FAIL on previous state (no app module), PASS on current state
+
+## Round 3
+**Task**: Task 3 - Implement specific media type models
+**Files modified**: src/app/models.py, src/app/tests/test_models.py
+**Commit**: Add specific media type models for tracking different kinds of content
+**Acceptance**: 13/13 criteria met
+**Verification**: tests FAIL on previous state (no Movie/Game etc. models), PASS on current state

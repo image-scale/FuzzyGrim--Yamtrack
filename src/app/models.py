@@ -281,3 +281,118 @@ class BoardGame(Media):
     """Model for board games."""
 
     pass
+
+
+class TV(Media):
+    """Model for TV shows."""
+
+    class Meta:
+        """Meta options for the model."""
+
+        ordering = ['user', 'item']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'item'],
+                name='%(app_label)s_%(class)s_unique_item_user',
+            ),
+        ]
+
+    @property
+    def progress(self):
+        """Return the total episodes watched for the TV show."""
+        return sum(
+            season.progress
+            for season in self.seasons.all()
+            if season.item.season_number != 0
+        )
+
+    @property
+    def last_watched(self):
+        """Return the latest watched episode in SxxExx format."""
+        watched_episodes = [
+            {
+                'season': season.item.season_number,
+                'episode': episode.item.episode_number,
+                'end_date': episode.end_date,
+            }
+            for season in self.seasons.all()
+            if hasattr(season, 'episodes') and season.item.season_number != 0
+            for episode in season.episodes.all()
+            if episode.end_date is not None
+        ]
+
+        if not watched_episodes:
+            return ''
+
+        latest_episode = max(
+            watched_episodes,
+            key=lambda x: (x['end_date'], x['season'], x['episode']),
+        )
+
+        return f"S{latest_episode['season']:02d}E{latest_episode['episode']:02d}"
+
+
+class Season(Media):
+    """Model for seasons of TV shows."""
+
+    related_tv = models.ForeignKey(
+        TV,
+        on_delete=models.CASCADE,
+        related_name='seasons',
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        """Meta options for the model."""
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['related_tv', 'item'],
+                name='%(app_label)s_season_unique_tv_item',
+            ),
+        ]
+
+    def __str__(self):
+        """Return the title of the media and season number."""
+        return f'{self.item.title} S{self.item.season_number}'
+
+    @property
+    def progress(self):
+        """Return the current episode number of the season."""
+        episodes = self.episodes.all()
+        if not episodes:
+            return 0
+
+        sorted_episodes = sorted(
+            episodes,
+            key=lambda e: -e.item.episode_number,
+        )
+        return sorted_episodes[0].item.episode_number
+
+
+class Episode(models.Model):
+    """Model for episodes of a season."""
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True)
+    related_season = models.ForeignKey(
+        Season,
+        on_delete=models.CASCADE,
+        related_name='episodes',
+    )
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        """Meta options for the model."""
+
+        ordering = [
+            'related_season',
+            'item__episode_number',
+            '-end_date',
+            '-created_at',
+        ]
+
+    def __str__(self):
+        """Return the season and episode number."""
+        return str(self.item)

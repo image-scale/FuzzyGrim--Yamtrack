@@ -706,3 +706,369 @@ class MinutesToHHMMTest(TestCase):
         from app.models import minutes_to_hhmm
 
         self.assertEqual(minutes_to_hhmm(120), '2h 00min')
+
+
+class TVModelTest(TestCase):
+    """Test cases for the TV model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.tv_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title='Game of Thrones',
+            image='https://example.com/got.jpg',
+        )
+
+    def test_tv_creation(self):
+        """Test creating a TV show tracking entry."""
+        from app.models import TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+        )
+        self.assertEqual(tv.item.title, 'Game of Thrones')
+        self.assertEqual(tv.status, Status.IN_PROGRESS.value)
+
+    def test_tv_unique_constraint(self):
+        """Test that user can only have one TV entry per item."""
+        from app.models import TV
+
+        TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+        )
+        with self.assertRaises(IntegrityError):
+            TV.objects.create(
+                item=self.tv_item,
+                user=self.user,
+                status=Status.COMPLETED.value,
+            )
+
+    def test_tv_progress_no_seasons(self):
+        """Test TV progress with no seasons."""
+        from app.models import TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        self.assertEqual(tv.progress, 0)
+
+    def test_tv_progress_with_seasons(self):
+        """Test TV progress aggregates across seasons."""
+        from app.models import Episode, Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+
+        # Create season 1 with 3 episodes
+        season1_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title='Game of Thrones',
+            image='https://example.com/s1.jpg',
+            season_number=1,
+        )
+        season1 = Season.objects.create(
+            item=season1_item,
+            user=self.user,
+            related_tv=tv,
+        )
+
+        for ep_num in [1, 2, 3]:
+            ep_item = Item.objects.create(
+                media_id='1399',
+                source=Sources.TMDB.value,
+                media_type=MediaTypes.EPISODE.value,
+                title='Game of Thrones',
+                image='https://example.com/e.jpg',
+                season_number=1,
+                episode_number=ep_num,
+            )
+            Episode.objects.create(
+                item=ep_item,
+                related_season=season1,
+            )
+
+        # Create season 2 with 2 episodes
+        season2_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title='Game of Thrones',
+            image='https://example.com/s2.jpg',
+            season_number=2,
+        )
+        season2 = Season.objects.create(
+            item=season2_item,
+            user=self.user,
+            related_tv=tv,
+        )
+
+        for ep_num in [1, 2]:
+            ep_item = Item.objects.create(
+                media_id='1399',
+                source=Sources.TMDB.value,
+                media_type=MediaTypes.EPISODE.value,
+                title='Game of Thrones',
+                image='https://example.com/e.jpg',
+                season_number=2,
+                episode_number=ep_num,
+            )
+            Episode.objects.create(
+                item=ep_item,
+                related_season=season2,
+            )
+
+        # Total progress: 3 (from S1) + 2 (from S2) = 5
+        self.assertEqual(tv.progress, 5)
+
+    def test_tv_excludes_season_zero(self):
+        """Test that TV progress excludes season 0 (specials)."""
+        from app.models import Episode, Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+
+        # Create season 0 (specials) with 2 episodes
+        season0_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title='Game of Thrones',
+            image='https://example.com/s0.jpg',
+            season_number=0,
+        )
+        season0 = Season.objects.create(
+            item=season0_item,
+            user=self.user,
+            related_tv=tv,
+        )
+
+        for ep_num in [1, 2]:
+            ep_item = Item.objects.create(
+                media_id='1399',
+                source=Sources.TMDB.value,
+                media_type=MediaTypes.EPISODE.value,
+                title='Game of Thrones',
+                image='https://example.com/e.jpg',
+                season_number=0,
+                episode_number=ep_num,
+            )
+            Episode.objects.create(
+                item=ep_item,
+                related_season=season0,
+            )
+
+        # Progress should be 0 since season 0 is excluded
+        self.assertEqual(tv.progress, 0)
+
+
+class SeasonModelTest(TestCase):
+    """Test cases for the Season model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.tv_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title='Game of Thrones',
+            image='https://example.com/got.jpg',
+        )
+        self.season_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title='Game of Thrones',
+            image='https://example.com/s1.jpg',
+            season_number=1,
+        )
+
+    def test_season_creation(self):
+        """Test creating a season tracking entry."""
+        from app.models import Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        season = Season.objects.create(
+            item=self.season_item,
+            user=self.user,
+            related_tv=tv,
+        )
+        self.assertEqual(season.item.season_number, 1)
+
+    def test_season_str(self):
+        """Test season string representation."""
+        from app.models import Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        season = Season.objects.create(
+            item=self.season_item,
+            user=self.user,
+            related_tv=tv,
+        )
+        self.assertEqual(str(season), 'Game of Thrones S1')
+
+    def test_season_progress_no_episodes(self):
+        """Test season progress with no episodes."""
+        from app.models import Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        season = Season.objects.create(
+            item=self.season_item,
+            user=self.user,
+            related_tv=tv,
+        )
+        self.assertEqual(season.progress, 0)
+
+    def test_season_progress_with_episodes(self):
+        """Test season progress returns highest episode number."""
+        from app.models import Episode, Season, TV
+
+        tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        season = Season.objects.create(
+            item=self.season_item,
+            user=self.user,
+            related_tv=tv,
+        )
+
+        for ep_num in [1, 2, 5]:  # Non-contiguous to test max logic
+            ep_item = Item.objects.create(
+                media_id='1399',
+                source=Sources.TMDB.value,
+                media_type=MediaTypes.EPISODE.value,
+                title='Game of Thrones',
+                image='https://example.com/e.jpg',
+                season_number=1,
+                episode_number=ep_num,
+            )
+            Episode.objects.create(
+                item=ep_item,
+                related_season=season,
+            )
+
+        # Progress should be the highest episode number
+        self.assertEqual(season.progress, 5)
+
+
+class EpisodeModelTest(TestCase):
+    """Test cases for the Episode model."""
+
+    def setUp(self):
+        """Set up test data."""
+        from app.models import Season, TV
+
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.tv_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title='Game of Thrones',
+            image='https://example.com/got.jpg',
+        )
+        self.season_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title='Game of Thrones',
+            image='https://example.com/s1.jpg',
+            season_number=1,
+        )
+        self.episode_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.EPISODE.value,
+            title='Game of Thrones',
+            image='https://example.com/e1.jpg',
+            season_number=1,
+            episode_number=1,
+        )
+        self.tv = TV.objects.create(
+            item=self.tv_item,
+            user=self.user,
+        )
+        self.season = Season.objects.create(
+            item=self.season_item,
+            user=self.user,
+            related_tv=self.tv,
+        )
+
+    def test_episode_creation(self):
+        """Test creating an episode tracking entry."""
+        from app.models import Episode
+
+        episode = Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+        )
+        self.assertEqual(episode.item.episode_number, 1)
+        self.assertEqual(episode.related_season, self.season)
+
+    def test_episode_str(self):
+        """Test episode string representation."""
+        from app.models import Episode
+
+        episode = Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+        )
+        self.assertEqual(str(episode), 'Game of Thrones S1E1')
+
+    def test_episode_relationship_to_season(self):
+        """Test episode relationship to season."""
+        from app.models import Episode
+
+        ep1_item = Item.objects.create(
+            media_id='1399',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.EPISODE.value,
+            title='Game of Thrones',
+            image='https://example.com/e.jpg',
+            season_number=1,
+            episode_number=2,
+        )
+
+        Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+        )
+        Episode.objects.create(
+            item=ep1_item,
+            related_season=self.season,
+        )
+
+        # Season should have 2 episodes
+        self.assertEqual(self.season.episodes.count(), 2)

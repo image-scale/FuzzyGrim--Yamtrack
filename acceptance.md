@@ -36,16 +36,30 @@
 ## Task 3: Implement specific media type models
 
 ### Acceptance Criteria
-- [ ] Movie model extends Media with basic tracking
-- [ ] Anime model extends Media with episode tracking
-- [ ] Manga model extends Media with chapter tracking
-- [ ] Game model extends Media with playtime tracking in minutes
-- [ ] Game.formatted_progress returns time in "Xh YYmin" format (e.g. "2h 30min", "45min")
-- [ ] Game.increase_progress() adds 30 minutes, decrease_progress() subtracts 30 minutes
-- [ ] Book model extends Media with page/chapter tracking
-- [ ] Comic model extends Media with issue tracking
-- [ ] BoardGame model extends Media with plays tracking
-- [ ] All models can be saved and retrieved from database
-- [ ] Tests verify Game playtime formatting works correctly
-- [ ] Tests verify Game progress methods add/subtract 30 minutes
-- [ ] Tests verify each model type can be created and persisted
+- [x] Movie model extends Media with basic tracking
+- [x] Anime model extends Media with episode tracking
+- [x] Manga model extends Media with chapter tracking
+- [x] Game model extends Media with playtime tracking in minutes
+- [x] Game.formatted_progress returns time in "Xh YYmin" format (e.g. "2h 30min", "45min")
+- [x] Game.increase_progress() adds 30 minutes, decrease_progress() subtracts 30 minutes
+- [x] Book model extends Media with page/chapter tracking
+- [x] Comic model extends Media with issue tracking
+- [x] BoardGame model extends Media with plays tracking
+- [x] All models can be saved and retrieved from database
+- [x] Tests verify Game playtime formatting works correctly
+- [x] Tests verify Game progress methods add/subtract 30 minutes
+- [x] Tests verify each model type can be created and persisted
+
+## Task 4: Implement TV/Season/Episode models
+
+### Acceptance Criteria
+- [ ] TV model extends Media with relationship to seasons
+- [ ] Season model extends Media with relationship to TV show and episodes
+- [ ] Episode model stores episode tracking data with relationship to season
+- [ ] TV.progress property aggregates episode count from all non-zero seasons
+- [ ] Season.progress property returns highest watched episode number
+- [ ] TV/Season have unique constraints per user
+- [ ] Hierarchical relationships: TV -> Seasons -> Episodes
+- [ ] Tests verify TV progress aggregation across seasons
+- [ ] Tests verify Season progress returns correct episode number
+- [ ] Tests verify model relationships are correctly established

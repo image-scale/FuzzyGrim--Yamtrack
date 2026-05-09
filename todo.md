@@ -6,8 +6,8 @@ Build the Django application incrementally, starting with project configuration 
 ## Tasks
 - [x] Task 1: Initialize Django project with settings, user model, and core configuration (config app + users app with custom User model supporting preferences)
 - [x] Task 2: Implement core media tracking models - Item, Media base class, and status/source/type enums with tracking capabilities (score, progress, status, dates, notes)
-- [>] Task 3: Implement specific media type models (Movie, Anime, Manga, Game, Book, Comic, BoardGame) inheriting from Media with unique behaviors like game playtime formatting
-- [ ] Task 4: Implement TV/Season/Episode models with hierarchical tracking - seasons belong to TV shows, episodes belong to seasons, with progress aggregation
+- [x] Task 3: Implement specific media type models (Movie, Anime, Manga, Game, Book, Comic, BoardGame) inheriting from Media with unique behaviors like game playtime formatting
+- [>] Task 4: Implement TV/Season/Episode models with hierarchical tracking - seasons belong to TV shows, episodes belong to seasons, with progress aggregation
 - [ ] Task 5: Implement MediaManager for querying media lists with filtering, sorting, and status annotations
 - [ ] Task 6: Implement helper utilities for time formatting, URL redirects, search response formatting, and user data enrichment
 - [ ] Task 7: Implement custom lists feature - CustomList and CustomListItem models with owner/collaborator permissions
