@@ -14,9 +14,9 @@ Build the Django application incrementally, starting with project configuration 
 - [x] Task 8: Implement calendar events - Event model for tracking upcoming media releases with manager for user-specific event queries
 - [x] Task 9: Implement statistics functionality - media distribution, status breakdown, score distribution, timeline, and activity tracking
 - [x] Task 10: Implement provider service layer - API request handling with rate limiting and error handling for external media databases
-- [ ] Task 11: Implement TMDB provider for TV shows and movies - search and metadata retrieval
-- [ ] Task 12: Implement MAL provider for anime and manga - search and metadata retrieval
-- [ ] Task 13: Implement IGDB provider for games and OpenLibrary/Hardcover providers for books
-- [ ] Task 14: Implement remaining providers - ComicVine for comics, BoardGameGeek for board games, MangaUpdates for manga
-- [ ] Task 15: Implement history processing for tracking changes with django-simple-history integration
+- [x] Task 11: Implement TMDB provider for TV shows and movies - search and metadata retrieval (completed in Task 10)
+- [x] Task 12: Implement MAL provider for anime and manga - search and metadata retrieval (completed in Task 10)
+- [x] Task 13: Implement IGDB provider for games and OpenLibrary/Hardcover providers for books (completed in Task 10)
+- [x] Task 14: Implement remaining providers - ComicVine for comics, BoardGameGeek for board games, MangaUpdates for manga (completed in Task 10)
+- [x] Task 15: Implement history processing for tracking changes with django-simple-history integration
 - [ ] Task 16: Implement export functionality for backing up user media data to CSV

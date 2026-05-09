@@ -145,3 +145,18 @@
 - [x] search() dispatcher routes search queries to appropriate provider
 - [x] Tests verify api_request handles errors correctly
 - [x] Tests verify dispatchers route to correct providers
+
+## Task 15: Implement history processing
+
+### Acceptance Criteria
+- [x] Create app/config.py module with MEDIA_TYPE_CONFIG and STATUS_CONFIG
+- [x] get_verb() returns present/past tense verb for media type (watch, read, play)
+- [x] get_unit() returns measurement unit for media type (Episode, Chapter, Page)
+- [x] Create app/templatetags/ package with datetime_format filter
+- [x] Create app/history_processor.py module
+- [x] process_history_entries() processes historical records into timeline entries
+- [x] format_description() generates human-readable change descriptions
+- [x] Status transitions generate natural language (e.g., "Currently watching", "Finished reading")
+- [x] Progress changes format appropriately per media type (playtime for games, pages for books)
+- [x] Tests verify get_verb and get_unit cover all media types
+- [x] Tests verify format_description for status, score, progress, notes changes
