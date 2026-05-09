@@ -213,3 +213,71 @@ class Media(models.Model):
         if self.progress > 0:
             self.progress -= 1
             self.save()
+
+
+def minutes_to_hhmm(total_minutes):
+    """Convert total minutes to human readable format."""
+    hours = int(total_minutes / 60)
+    minutes = int(total_minutes % 60)
+    if hours == 0:
+        return f'{minutes}min'
+    return f'{hours}h {minutes:02d}min'
+
+
+class Movie(Media):
+    """Model for movies."""
+
+    pass
+
+
+class Anime(Media):
+    """Model for anime."""
+
+    pass
+
+
+class Manga(Media):
+    """Model for manga."""
+
+    pass
+
+
+class Game(Media):
+    """Model for games with playtime tracking in minutes."""
+
+    @property
+    def formatted_progress(self):
+        """Return progress in hours:minutes format."""
+        return minutes_to_hhmm(self.progress)
+
+    def increase_progress(self):
+        """Increase the progress of the game by 30 minutes."""
+        self.progress += 30
+        self.save()
+
+    def decrease_progress(self):
+        """Decrease the progress of the game by 30 minutes."""
+        if self.progress >= 30:
+            self.progress -= 30
+            self.save()
+        elif self.progress > 0:
+            self.progress = 0
+            self.save()
+
+
+class Book(Media):
+    """Model for books."""
+
+    pass
+
+
+class Comic(Media):
+    """Model for comics."""
+
+    pass
+
+
+class BoardGame(Media):
+    """Model for board games."""
+
+    pass

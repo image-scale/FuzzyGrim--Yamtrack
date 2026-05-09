@@ -356,3 +356,353 @@ class MediaProgressMethodsTest(TestCase):
             user=self.user,
         )
         self.assertEqual(str(media), 'Test Anime')
+
+
+class MovieModelTest(TestCase):
+    """Test cases for the Movie model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='550',
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title='Fight Club',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_movie_creation(self):
+        """Test creating a movie tracking entry."""
+        from app.models import Movie
+
+        movie = Movie.objects.create(
+            item=self.item,
+            user=self.user,
+            status=Status.COMPLETED.value,
+            progress=1,
+        )
+        self.assertEqual(movie.item.title, 'Fight Club')
+        self.assertEqual(movie.status, Status.COMPLETED.value)
+
+    def test_movie_formatted_progress(self):
+        """Test movie progress is simple number string."""
+        from app.models import Movie
+
+        movie = Movie.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=1,
+        )
+        self.assertEqual(movie.formatted_progress, '1')
+
+
+class AnimeModelTest(TestCase):
+    """Test cases for the Anime model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='21',
+            source=Sources.MAL.value,
+            media_type=MediaTypes.ANIME.value,
+            title='One Punch Man',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_anime_creation(self):
+        """Test creating an anime tracking entry."""
+        from app.models import Anime
+
+        anime = Anime.objects.create(
+            item=self.item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+            progress=6,
+        )
+        self.assertEqual(anime.item.title, 'One Punch Man')
+        self.assertEqual(anime.progress, 6)
+
+    def test_anime_increase_progress(self):
+        """Test increasing anime episode progress."""
+        from app.models import Anime
+
+        anime = Anime.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=5,
+        )
+        anime.increase_progress()
+        anime.refresh_from_db()
+        self.assertEqual(anime.progress, 6)
+
+
+class MangaModelTest(TestCase):
+    """Test cases for the Manga model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='1',
+            source=Sources.MAL.value,
+            media_type=MediaTypes.MANGA.value,
+            title='One Piece',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_manga_creation(self):
+        """Test creating a manga tracking entry."""
+        from app.models import Manga
+
+        manga = Manga.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=1100,
+        )
+        self.assertEqual(manga.progress, 1100)
+
+
+class GameModelTest(TestCase):
+    """Test cases for the Game model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='1942',
+            source=Sources.IGDB.value,
+            media_type=MediaTypes.GAME.value,
+            title='The Witcher 3',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_game_creation(self):
+        """Test creating a game tracking entry."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=120,
+        )
+        self.assertEqual(game.progress, 120)
+
+    def test_game_formatted_progress_minutes_only(self):
+        """Test game progress formatting for minutes only."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=45,
+        )
+        self.assertEqual(game.formatted_progress, '45min')
+
+    def test_game_formatted_progress_hours_and_minutes(self):
+        """Test game progress formatting for hours and minutes."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=150,
+        )
+        self.assertEqual(game.formatted_progress, '2h 30min')
+
+    def test_game_formatted_progress_zero(self):
+        """Test game progress formatting for zero minutes."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=0,
+        )
+        self.assertEqual(game.formatted_progress, '0min')
+
+    def test_game_increase_progress(self):
+        """Test increasing game progress adds 30 minutes."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=60,
+        )
+        game.increase_progress()
+        game.refresh_from_db()
+        self.assertEqual(game.progress, 90)
+
+    def test_game_decrease_progress(self):
+        """Test decreasing game progress subtracts 30 minutes."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=90,
+        )
+        game.decrease_progress()
+        game.refresh_from_db()
+        self.assertEqual(game.progress, 60)
+
+    def test_game_decrease_progress_less_than_30(self):
+        """Test decreasing game progress when less than 30 minutes."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=20,
+        )
+        game.decrease_progress()
+        game.refresh_from_db()
+        self.assertEqual(game.progress, 0)
+
+    def test_game_decrease_progress_at_zero(self):
+        """Test decreasing game progress at zero does nothing."""
+        from app.models import Game
+
+        game = Game.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=0,
+        )
+        game.decrease_progress()
+        game.refresh_from_db()
+        self.assertEqual(game.progress, 0)
+
+
+class BookModelTest(TestCase):
+    """Test cases for the Book model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='OL7353617M',
+            source=Sources.OPENLIBRARY.value,
+            media_type=MediaTypes.BOOK.value,
+            title='The Hobbit',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_book_creation(self):
+        """Test creating a book tracking entry."""
+        from app.models import Book
+
+        book = Book.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=150,
+        )
+        self.assertEqual(book.progress, 150)
+
+
+class ComicModelTest(TestCase):
+    """Test cases for the Comic model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='4050-18005',
+            source=Sources.COMICVINE.value,
+            media_type=MediaTypes.COMIC.value,
+            title='Batman: Year One',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_comic_creation(self):
+        """Test creating a comic tracking entry."""
+        from app.models import Comic
+
+        comic = Comic.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=4,
+        )
+        self.assertEqual(comic.progress, 4)
+
+
+class BoardGameModelTest(TestCase):
+    """Test cases for the BoardGame model."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+        )
+        self.item = Item.objects.create(
+            media_id='174430',
+            source=Sources.BGG.value,
+            media_type=MediaTypes.BOARDGAME.value,
+            title='Gloomhaven',
+            image='https://example.com/image.jpg',
+        )
+
+    def test_boardgame_creation(self):
+        """Test creating a board game tracking entry."""
+        from app.models import BoardGame
+
+        boardgame = BoardGame.objects.create(
+            item=self.item,
+            user=self.user,
+            progress=5,
+        )
+        self.assertEqual(boardgame.progress, 5)
+
+
+class MinutesToHHMMTest(TestCase):
+    """Test cases for the minutes_to_hhmm helper function."""
+
+    def test_minutes_only(self):
+        """Test formatting minutes only."""
+        from app.models import minutes_to_hhmm
+
+        self.assertEqual(minutes_to_hhmm(30), '30min')
+
+    def test_hours_and_minutes(self):
+        """Test formatting hours and minutes."""
+        from app.models import minutes_to_hhmm
+
+        self.assertEqual(minutes_to_hhmm(90), '1h 30min')
+
+    def test_hours_and_minutes_padded(self):
+        """Test that minutes are zero-padded."""
+        from app.models import minutes_to_hhmm
+
+        self.assertEqual(minutes_to_hhmm(125), '2h 05min')
+
+    def test_zero_minutes(self):
+        """Test formatting zero minutes."""
+        from app.models import minutes_to_hhmm
+
+        self.assertEqual(minutes_to_hhmm(0), '0min')
+
+    def test_exact_hours(self):
+        """Test formatting exact hours."""
+        from app.models import minutes_to_hhmm
+
+        self.assertEqual(minutes_to_hhmm(120), '2h 00min')
