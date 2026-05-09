@@ -43,3 +43,11 @@
 **Commit**: Add MediaManager for filtered media list queries with sorting and prefetch support
 **Acceptance**: 12/12 criteria met
 **Verification**: tests FAIL on previous state (no MediaManager/BasicMedia), PASS on current state
+
+## Round 7
+**Task**: Task 7 - Implement custom lists feature
+**Files created**: src/lists/ (app with models.py, migrations/, tests/)
+**Files modified**: src/config/settings.py (added lists to INSTALLED_APPS)
+**Commit**: Add custom lists feature with owner/collaborator permissions and item management
+**Acceptance**: 14/14 criteria met
+**Verification**: tests FAIL on previous state (no lists app), PASS on current state

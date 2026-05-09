@@ -88,3 +88,21 @@
 - [x] Tests verify get_media_list() returns correct filtered results
 - [x] Tests verify sorting by different fields works correctly
 - [x] Tests verify repeat annotation shows correct count
+
+## Task 7: Implement custom lists feature
+
+### Acceptance Criteria
+- [x] Create lists app with models.py
+- [x] CustomList model with name, description, owner (ForeignKey to User)
+- [x] CustomList has collaborators ManyToMany field to User
+- [x] CustomList has items ManyToMany field to Item through CustomListItem
+- [x] CustomList.user_can_view() checks if user is owner or collaborator
+- [x] CustomList.user_can_edit() checks if user is owner or collaborator
+- [x] CustomList.user_can_delete() checks if user is owner
+- [x] CustomListItem model with item, custom_list, date_added fields
+- [x] CustomListItem has unique constraint on item+custom_list
+- [x] CustomListManager.get_user_lists() returns owned or collaborated lists
+- [x] CustomListItemManager.get_last_added_date() returns latest date_added
+- [x] Tests verify CustomList creation and permissions
+- [x] Tests verify CustomListItem unique constraint
+- [x] Tests verify manager methods return correct results
