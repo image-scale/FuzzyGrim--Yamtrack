@@ -72,3 +72,19 @@
 - [x] Create app/helpers.py module for utility functions
 - [x] Tests verify minutes_to_hhmm formatting for various inputs
 - [x] Tests verify search response formatting
+
+## Task 6: Implement MediaManager for querying media lists
+
+### Acceptance Criteria
+- [x] MediaManager class created as a custom Django manager
+- [x] get_media_list() method filters by user, media_type, status, with optional search
+- [x] get_media_list() annotates with repeat count and filters to latest entry per item
+- [x] _apply_prefetch_related() prefetches seasons/episodes for TV and Season types
+- [x] _sort_media_list() sorts by various fields (title, score, progress, dates)
+- [x] _sort_tv_media_list() handles TV-specific sorting (aggregates from seasons)
+- [x] _sort_season_media_list() handles Season-specific sorting (aggregates from episodes)
+- [x] _sort_generic_media_list() handles date fields with nulls_last
+- [x] BasicMedia model created to attach MediaManager
+- [x] Tests verify get_media_list() returns correct filtered results
+- [x] Tests verify sorting by different fields works correctly
+- [x] Tests verify repeat annotation shows correct count

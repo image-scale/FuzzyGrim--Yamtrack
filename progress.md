@@ -35,3 +35,11 @@
 **Commit**: Add helper utilities module with time formatting and search response functions
 **Acceptance**: 5/5 criteria met
 **Verification**: tests FAIL on previous state (no helpers module), PASS on current state
+
+## Round 6
+**Task**: Task 6 - Implement MediaManager for querying media lists
+**Files created**: src/app/tests/test_manager.py, src/app/migrations/0001_initial.py
+**Files modified**: src/app/models.py (added MediaManager class and BasicMedia model)
+**Commit**: Add MediaManager for filtered media list queries with sorting and prefetch support
+**Acceptance**: 12/12 criteria met
+**Verification**: tests FAIL on previous state (no MediaManager/BasicMedia), PASS on current state

@@ -2,6 +2,7 @@
 
 import uuid
 
+from django.apps import apps
 from django.conf import settings
 from django.core.validators import (
     DecimalValidator,
@@ -9,9 +10,185 @@ from django.core.validators import (
     MinValueValidator,
 )
 from django.db import models
-from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.db.models import (
+    CheckConstraint,
+    Count,
+    F,
+    Prefetch,
+    Q,
+    UniqueConstraint,
+    Window,
+)
+from django.db.models.functions import Lower, RowNumber
 
 from app.helpers import minutes_to_hhmm
+
+
+class MediaManager(models.Manager):
+    """Custom manager for media models."""
+
+    def get_media_list(self, user, media_type, status_filter, sort_filter, search=None):
+        """Get media list based on filters, sorting and search."""
+        import users.models as users_models
+
+        model = apps.get_model(app_label='app', model_name=media_type)
+        queryset = model.objects.filter(user=user.id)
+
+        if status_filter != users_models.MediaStatusChoices.ALL:
+            queryset = queryset.filter(status=status_filter)
+
+        if search:
+            queryset = queryset.filter(item__title__icontains=search)
+
+        queryset = queryset.annotate(
+            repeats=Window(
+                expression=Count('id'),
+                partition_by=[F('item')],
+            ),
+            row_number=Window(
+                expression=RowNumber(),
+                partition_by=[F('item')],
+                order_by=F('created_at').desc(),
+            ),
+        ).filter(row_number=1)
+
+        queryset = queryset.select_related('item')
+        queryset = self._apply_prefetch_related(queryset, media_type)
+
+        if sort_filter:
+            return self._sort_media_list(queryset, sort_filter, media_type)
+        return queryset
+
+    def _apply_prefetch_related(self, queryset, media_type):
+        """Apply appropriate prefetch_related based on media type."""
+        if media_type == MediaTypes.TV.value:
+            return queryset.prefetch_related(
+                Prefetch(
+                    'seasons',
+                    queryset=Season.objects.select_related('item'),
+                ),
+                Prefetch(
+                    'seasons__episodes',
+                    queryset=Episode.objects.select_related('item'),
+                ),
+            )
+
+        if media_type == MediaTypes.SEASON.value:
+            return queryset.prefetch_related(
+                Prefetch(
+                    'episodes',
+                    queryset=Episode.objects.select_related('item'),
+                ),
+            )
+
+        return queryset
+
+    def _sort_media_list(self, queryset, sort_filter, media_type=None):
+        """Sort media list using SQL sorting with annotations."""
+        if media_type == MediaTypes.TV.value:
+            return self._sort_tv_media_list(queryset, sort_filter)
+        if media_type == MediaTypes.SEASON.value:
+            return self._sort_season_media_list(queryset, sort_filter)
+
+        return self._sort_generic_media_list(queryset, sort_filter)
+
+    def _sort_tv_media_list(self, queryset, sort_filter):
+        """Sort TV media list based on the sort criteria."""
+        if sort_filter == 'start_date':
+            queryset = queryset.annotate(
+                calculated_start_date=models.Min(
+                    'seasons__episodes__end_date',
+                    filter=models.Q(seasons__item__season_number__gt=0),
+                ),
+            )
+            return queryset.order_by(
+                models.F('calculated_start_date').asc(nulls_last=True),
+                Lower('item__title'),
+            )
+
+        if sort_filter == 'end_date':
+            queryset = queryset.annotate(
+                calculated_end_date=models.Max(
+                    'seasons__episodes__end_date',
+                    filter=models.Q(seasons__item__season_number__gt=0),
+                ),
+            )
+            return queryset.order_by(
+                models.F('calculated_end_date').desc(nulls_last=True),
+                Lower('item__title'),
+            )
+
+        if sort_filter == 'progress':
+            queryset = queryset.annotate(
+                calculated_progress=models.Count(
+                    'seasons__episodes',
+                    filter=models.Q(seasons__item__season_number__gt=0),
+                ),
+            )
+            return queryset.order_by(
+                '-calculated_progress',
+                Lower('item__title'),
+            )
+
+        return self._sort_generic_media_list(queryset, sort_filter)
+
+    def _sort_season_media_list(self, queryset, sort_filter):
+        """Sort Season media list based on the sort criteria."""
+        if sort_filter == 'start_date':
+            queryset = queryset.annotate(
+                calculated_start_date=models.Min('episodes__end_date'),
+            )
+            return queryset.order_by(
+                models.F('calculated_start_date').asc(nulls_last=True),
+                Lower('item__title'),
+            )
+
+        if sort_filter == 'end_date':
+            queryset = queryset.annotate(
+                calculated_end_date=models.Max('episodes__end_date'),
+            )
+            return queryset.order_by(
+                models.F('calculated_end_date').desc(nulls_last=True),
+                Lower('item__title'),
+            )
+
+        if sort_filter == 'progress':
+            queryset = queryset.annotate(
+                calculated_progress=models.Max('episodes__item__episode_number'),
+            )
+            return queryset.order_by(
+                '-calculated_progress',
+                Lower('item__title'),
+            )
+
+        return self._sort_generic_media_list(queryset, sort_filter)
+
+    def _sort_generic_media_list(self, queryset, sort_filter):
+        """Apply generic sorting logic for all media types."""
+        if sort_filter in ('start_date', 'end_date'):
+            if sort_filter == 'start_date':
+                return queryset.order_by(
+                    models.F(sort_filter).asc(nulls_last=True),
+                    Lower('item__title'),
+                )
+            return queryset.order_by(
+                models.F(sort_filter).desc(nulls_last=True),
+                Lower('item__title'),
+            )
+
+        item_fields = [f.name for f in Item._meta.fields]
+        if sort_filter in item_fields:
+            if sort_filter == 'title':
+                return queryset.order_by(Lower('item__title'))
+            return queryset.order_by(
+                f'-item__{sort_filter}',
+                Lower('item__title'),
+            )
+
+        return queryset.order_by(
+            models.F(sort_filter).desc(nulls_last=True),
+            Lower('item__title'),
+        )
 
 
 class Sources(models.TextChoices):
@@ -215,6 +392,12 @@ class Media(models.Model):
         if self.progress > 0:
             self.progress -= 1
             self.save()
+
+
+class BasicMedia(Media):
+    """Model for basic media types with the MediaManager attached."""
+
+    objects = MediaManager()
 
 
 class Movie(Media):

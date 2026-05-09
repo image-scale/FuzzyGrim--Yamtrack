@@ -9,8 +9,8 @@ Build the Django application incrementally, starting with project configuration 
 - [x] Task 3: Implement specific media type models (Movie, Anime, Manga, Game, Book, Comic, BoardGame) inheriting from Media with unique behaviors like game playtime formatting
 - [x] Task 4: Implement TV/Season/Episode models with hierarchical tracking - seasons belong to TV shows, episodes belong to seasons, with progress aggregation
 - [x] Task 5: Implement helper utilities for time formatting and search response formatting
-- [>] Task 6: Implement MediaManager for querying media lists with filtering, sorting, and status annotations
-- [ ] Task 7: Implement custom lists feature - CustomList and CustomListItem models with owner/collaborator permissions
+- [x] Task 6: Implement MediaManager for querying media lists with filtering, sorting, and status annotations
+- [>] Task 7: Implement custom lists feature - CustomList and CustomListItem models with owner/collaborator permissions
 - [ ] Task 8: Implement calendar events - Event model for tracking upcoming media releases with manager for user-specific event queries
 - [ ] Task 9: Implement statistics functionality - media distribution, status breakdown, score distribution, timeline, and activity tracking
 - [ ] Task 10: Implement provider service layer - API request handling with rate limiting and error handling for external media databases
