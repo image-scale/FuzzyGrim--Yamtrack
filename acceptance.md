@@ -134,3 +134,14 @@
 - [x] Tests verify media retrieval and counting
 - [x] Tests verify distribution calculations
 - [x] Tests verify streak calculation
+
+## Task 10: Implement provider service layer
+
+### Acceptance Criteria
+- [x] Create app/providers/ package with __init__.py and services.py
+- [x] ProviderAPIError exception class for API errors
+- [x] api_request() function for HTTP requests with timeout and error handling
+- [x] get_media_metadata() dispatcher routes to appropriate provider
+- [x] search() dispatcher routes search queries to appropriate provider
+- [x] Tests verify api_request handles errors correctly
+- [x] Tests verify dispatchers route to correct providers
