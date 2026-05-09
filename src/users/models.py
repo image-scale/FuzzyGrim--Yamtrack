@@ -5,35 +5,12 @@ import secrets
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from app.models import MediaTypes, Status
+
 
 def generate_token():
     """Generate a secure user token."""
     return secrets.token_urlsafe(24)
-
-
-class MediaTypes(models.TextChoices):
-    """Choices for the media type of the item."""
-
-    TV = 'tv', 'TV Show'
-    SEASON = 'season', 'TV Season'
-    EPISODE = 'episode', 'Episode'
-    MOVIE = 'movie', 'Movie'
-    ANIME = 'anime', 'Anime'
-    MANGA = 'manga', 'Manga'
-    GAME = 'game', 'Game'
-    BOOK = 'book', 'Book'
-    COMIC = 'comic', 'Comic'
-    BOARDGAME = 'boardgame', 'Boardgame'
-
-
-class Status(models.TextChoices):
-    """Choices for item status."""
-
-    COMPLETED = 'Completed', 'Completed'
-    IN_PROGRESS = 'In progress', 'In Progress'
-    PLANNING = 'Planning', 'Planning'
-    PAUSED = 'Paused', 'Paused'
-    DROPPED = 'Dropped', 'Dropped'
 
 
 class HomeSortChoices(models.TextChoices):

@@ -5,13 +5,13 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from app.models import MediaTypes
 from users.models import (
     VALID_SEARCH_TYPES,
     HomeSortChoices,
     LayoutChoices,
     MediaSortChoices,
     MediaStatusChoices,
-    MediaTypes,
     QuickWatchDateChoices,
 )
 
